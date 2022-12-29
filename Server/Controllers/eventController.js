@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
-import eventModel from '../Models/event.model';
+import eventModel from '../Models/event.model.js';
 
 export const createEvent = async(req, res) => {
     const event = req.body;
-    const newEvent = eventModel({...event});
+    const newEvent = eventModel({...event,ownerId:req.userId});
     try {
         await newEvent.save();
         res.status(201).json(newEvent);
@@ -18,6 +18,25 @@ export const getEvents = async(req, res) => {
         res.json(events);
     } catch (error) {
         res.status(404).json({message: error})
+    }
+}
+
+export const getEvent = async(req, res) => {
+    try {
+        const {eventId} = req.params;
+        const event = await eventModel.findById(eventId);
+        res.status(200).json(event);
+    } catch (error) {
+        res.status(404).json({message: "Something went wrong"})
+    }
+}
+
+export const getOwnerEvents = async(req, res) => {
+    try {
+        const events = await eventModel.find({ownerId:req.id});
+        res.status(200).json(events);
+    } catch (error) {
+        res.status(404).json({message: "Something went wrong"})
     }
 }
 

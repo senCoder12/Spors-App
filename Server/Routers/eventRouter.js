@@ -1,11 +1,14 @@
 import express from "express";
-import { createEvent, getEventBySearch, getEvents, updateEvent } from "../Controllers/eventController.js";
+import { createEvent, getEvent, getEventBySearch, getEvents, getOwnerEvents, updateEvent } from "../Controllers/eventController.js";
+import { auth } from "../Middleware/auth.js";
 
 const eventRouter = express.Router();
 
-eventRouter.post('/', createEvent);
+eventRouter.post('/', auth, createEvent);
 eventRouter.get('/', getEvents);
-eventRouter.patch('/:id', updateEvent);
+eventRouter.get('/:eventId', getEvent);
+eventRouter.patch('/:id',auth, updateEvent);
 eventRouter.get('/search', getEventBySearch);
+eventRouter.get('/ownerEvents', auth, getOwnerEvents);
 
 export default eventRouter;

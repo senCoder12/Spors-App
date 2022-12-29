@@ -74,12 +74,8 @@ export const signin =  async (req, res) => {
 
 export const updateEventConfirmRequestState = async(req, res) => {
     try {
-        const {userId} = req.params;
         const updatedData = req.body;
-        if(!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(404).json({message: "User does not exist"});
-        }
-        await userModel.findByIdAndUpdate(id,updatedData,{new: true});
+        await userModel.findByIdAndUpdate(req.id,updatedData,{new: true});
         return res.status(200).json(updatedData);   
     } catch (error) {
         return res.status(404).json({message: "Something went wrong"});  
