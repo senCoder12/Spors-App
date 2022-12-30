@@ -26,14 +26,22 @@ const eventSchema = new mongoose.Schema(
         type: Number,
         required: true
     },
-    players: {
-        type: [String],
-        required: false
-    },
-    Requestplayers: {
-        type: [String],
-        required: false
-    }
+    // players: {
+    //     type: [String],
+    //     required: false
+    // },
+    players: [
+      {playerName: String},
+      {playerId: String}
+    ],
+    // Requestplayers: {
+    //     type: [String],
+    //     required: false
+    // },
+    Requestplayers: [
+      {playerName: String},
+      {playerId: String}
+    ]
   },
   {
     versionKey: false,

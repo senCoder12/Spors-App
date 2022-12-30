@@ -16,11 +16,11 @@ const userSchema = new mongoose.Schema(
     },
     EventsConfirmed: {
         type: [String],
-        required: false
+        default: []
     },
     EventsPending: {
         type: [String],
-        required: false
+        default: []
     }
   },
   {
