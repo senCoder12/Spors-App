@@ -1,10 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authSlice from "./Features/authSlice";
-// import eventSlice from "./Features/eventSlice";
+import eventSlice from "./Features/eventSlice";
 
 export default configureStore({
     reducer: {
         auth: authSlice,
-        // tour: tourSlice
+        event: eventSlice
     }
 })

@@ -65,7 +65,7 @@ function Header() {
                         </MDBNavbarItem>
                         {user?.result[0]?._id && (
                             <MDBNavbarItem>
-                                <MDBNavbarLink href='/addTour'>
+                                <MDBNavbarLink href='/addEvent'>
                                     <p className='header-text'>Add Event</p>
                                 </MDBNavbarLink>
                              </MDBNavbarItem>

@@ -16,7 +16,7 @@ export const signUp = (FormData) => API.post("/user/signup",FormData);
 export const updateRequestPending = (updatedData) => API.patch(`/user/update`,updatedData);
 
 
-export const createEvent = (FormData) => API.post("/event",FormData);
+export const createEvent = (updatedeventData) => API.post("/event",updatedeventData);
 export const getEvents = () => API.get(`/event`);
 export const getEvent = (id) => API.get(`/event/${id}`);
 export const getOwnerEvents = () => API.get(`/event/ownerEvents`);

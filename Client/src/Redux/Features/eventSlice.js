@@ -1,9 +1,9 @@
 import {createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import * as api from "../api"
 
-export const createEvent = createAsyncThunk("event/create", async({updatedEvent,navigate,toast},{rejectWithValue})=>{
+export const createEvent = createAsyncThunk("event/create", async({updatedeventData,navigate,toast},{rejectWithValue})=>{
     try {
-        const response = await api.createEvent(updatedEvent);
+        const response = await api.createEvent(updatedeventData);
         toast.success("Created successfully");
         navigate("/");
         return response.data;
