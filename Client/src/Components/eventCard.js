@@ -15,7 +15,7 @@ export default function CardEvent({ img, description, title, _id }) {
 
     return (
         <MDBCardGroup>
-            <Link to={`tour/${_id}`}>
+            <Link to={`event/${_id}`}>
                 <MDBCard className='h-100 mt-2 d-sm-flex' style={{ maxWidth: "20rem" }}>
                     <MDBCardImage
                         src={img}

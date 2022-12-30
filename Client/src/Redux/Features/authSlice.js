@@ -24,6 +24,15 @@ export const register = createAsyncThunk("auth/register", async({formValue,navig
     }
 })
 
+export const updateRequestPending = createAsyncThunk("auth/update", async(updatedEventData,{rejectWithValue})=>{
+    try {
+        const response = await api.updateRequestPending(updatedEventData);
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response.data);
+    }
+})
+
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
@@ -61,6 +70,17 @@ const authSlice = createSlice({
             state.user = action.payload;
         },
         [register.rejected] : (state,action)=> {
+            state.loading = false;
+            state.error = action.payload.error;
+        },
+        [updateRequestPending.pending] : (state,action)=> {
+            state.loading = true;
+        },
+        [updateRequestPending.fulfilled] : (state,action)=> {
+            state.loading = false;
+            state.user = action.payload;
+        },
+        [updateRequestPending.rejected] : (state,action)=> {
             state.loading = false;
             state.error = action.payload.error;
         }

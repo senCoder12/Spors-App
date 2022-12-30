@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom';
 import { getEvents } from '../Redux/Features/eventSlice';
 import CardEvent from '../Components/eventCard';
+import Spinner from '../Components/Spinner';
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -15,9 +16,9 @@ export default function Home() {
     dispatch(getEvents());
   },[])
 
-//   if(loading) {
-
-//   }
+  if(loading) {
+    return <Spinner/>
+  }
   return (
     <div style={{margin: "auto",padding: "15px", maxWidth: "1000px", alignContent: "center"}}>
       <MDBRow className='mt-5'>

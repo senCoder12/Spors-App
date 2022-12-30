@@ -83,7 +83,7 @@ const eventSlice = createSlice({
         },
         [getEvents.fulfilled] : (state,action)=> {
             state.loading = false;
-            state.events = action.payload.data;
+            state.events = action.payload;
         },
         [getEvents.rejected] : (state,action)=> {
             state.loading = false;
