@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const eventSchema = new mongoose.Schema(
   {
-    eventName: {
+    title: {
       type: String,
       required: true,
     },
@@ -14,7 +14,7 @@ const eventSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    EventTime: {
+    eventTime: {
       type: Date,
       required: false
     },
@@ -22,7 +22,7 @@ const eventSchema = new mongoose.Schema(
         type: String,
         required: true
     },
-    remainingNoOfPlayers: {
+    maximumNoOfPlayers: {
         type: Number,
         required: true
     },

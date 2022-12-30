@@ -8,6 +8,7 @@ export const createEvent = async(req, res) => {
         await newEvent.save();
         res.status(201).json(newEvent);
     } catch (error) {
+        console.log(error);
         res.status(404).json({message: "Something went wrong"})
     }
 }
