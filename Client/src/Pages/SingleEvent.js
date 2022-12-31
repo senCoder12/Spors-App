@@ -13,24 +13,76 @@ function SingleEvent() {
     const dispatch = useDispatch();
     const { title, description, _id, maximumNoOfPlayers, img, players, ownerId, eventTime, Requestplayers } = event;
     const { eventId } = useParams();
+    const Requestedplayers = Requestplayers || [];
+    const playerss = players || [];
 
     useEffect(() => {
         dispatch(getEvent(eventId));
     }, [])
 
-    const sendRequestHandler = ()=> {
-        let updateEvent = {...event};
-        if(!updateEvent.Requestplayers) {
-            updateEvent.Requestplayers=[];
+    const checkExpiredGame = () => {
+        if (eventTime && eventTime < new Date()) {
+            return true;
         }
-        updateEvent.Requestplayers.push({
-            playerName: user?.result[0].name,
-            playerId: user?.result[0]._id
-        })
-        dispatch(updateEvent({eventId:_id,updateEvent}));
-        let updateUser = {...user};
-        updateUser.result[0].EventsPending.push(_id);
+        return false;
+    }
+
+    const sendRequestHandler = ()=> {
+        let updatedEventData = {...event};
+        if(!updatedEventData.Requestplayers.length) {
+            updatedEventData.Requestplayers=[{
+                playerName: user?.result[0].name,
+                playerId: user?.result[0]._id
+            }];
+        } else {
+            const {Requestplayers} = updatedEventData;
+            updatedEventData.Requestplayers = [...Requestplayers, {
+                playerName: user?.result[0].name,
+                playerId: user?.result[0]._id
+            }]
+        }
+        dispatch(updateEvent({eventId:_id,updatedEventData}));
+
+        let updateUser = {...user.result[0]};
+        if(!updateUser.EventsPending.length) {
+            updateUser.EventsPending=[{
+                eventName: event?.title,
+                eventId: event?._id
+            }];
+        } else {
+            const {EventsPending} = updateUser;
+            updateUser.Requestplayers = [...EventsPending, {
+                eventName: event?.title,
+                eventId: event?._id
+            }]
+        }
         dispatch(updateRequestPending(updateUser));
+    }
+    const acceptHandler = (requestedplayer) => {
+        let updatedEventData = {...event};
+        updatedEventData.Requestplayers = updatedEventData.Requestplayers.filter((player) => {
+            return player.playerId!== requestedplayer.playerId;
+        });
+        if(!players.length) {
+            updatedEventData.players = [{
+                playerName: requestedplayer.playerName,
+                playerId: requestedplayer.playerId
+            }];
+        } else {
+            const {players} = updatedEventData;
+            updatedEventData.players = [...players, {
+                playerName: requestedplayer.playerName,
+                playerId: requestedplayer.playerId
+            }]
+        }
+        dispatch(updateEvent({eventId:_id,updatedEventData}));
+    }
+    const rejectHandler = (requestedplayer)=> {
+        let updatedEventData = {...event};
+        updatedEventData.Requestplayers = updatedEventData.Requestplayers.filter((player) => {
+            return player.playerId!== requestedplayer.playerId;
+        });
+        dispatch(updateEvent({eventId:_id,updatedEventData}));
     }
 
     // const getFormatTime = (event)=> {}
@@ -62,16 +114,38 @@ function SingleEvent() {
                                             Event Timing: {eventTime}
                                         </MDBCol>
                                         {
-                                            user?.result[0]?._id != ownerId && (
+                                            !checkExpiredGame() && user?.result[0]?._id != ownerId && !Requestedplayers.find(elm=> elm.playerId==user?.result[0]?._id) &&
+                                            !playerss.find(elm=> elm.playerId==user?.result[0]?._id) && (
                                                 <MDBCol md='4'>
                                                     <MDBBtn onClick={()=>sendRequestHandler()}>Send Request</MDBBtn>
                                                 </MDBCol>
                                             )
                                         }
                                         {
-                                            user?.result[0]?._id == ownerId && (
+                                            !checkExpiredGame() &&user?.result[0]?._id != ownerId && Requestedplayers.find(elm=> elm.playerId==user?.result[0]?._id) && (
+                                                <MDBCol md='4'>
+                                                    <MDBBtn>Request pending...</MDBBtn>
+                                                </MDBCol>
+                                            )
+                                        }
+                                        {
+                                            !checkExpiredGame() &&user?.result[0]?._id != ownerId && playerss.find(elm=> elm.playerId==user?.result[0]?._id) && (
+                                                <MDBCol md='4'>
+                                                    <MDBBtn>Accepted</MDBBtn>
+                                                </MDBCol>
+                                            )
+                                        }
+                                        {
+                                            !checkExpiredGame() &&user?.result[0]?._id == ownerId && (
                                                 <MDBCol md='4'>
                                                     <MDBBtn color='info'>Own Event</MDBBtn>
+                                                </MDBCol>
+                                            )
+                                        }
+                                        {
+                                            checkExpiredGame() && (
+                                                <MDBCol md='4'>
+                                                    <MDBBtn color='warning'>Game Expired</MDBBtn>
                                                 </MDBCol>
                                             )
                                         }
@@ -88,7 +162,7 @@ function SingleEvent() {
                         <div style={{ margin: "auto", padding: "15px", maxWidth: "500px", alignContent: "center", marginTop: "30px" }}>
                             <h2>Event Players</h2>
                             {
-                                !players  && (
+                                playerss.length==0  && (
                                     <>No player is Accepted yet</>
                                 )
                             }
@@ -99,9 +173,7 @@ function SingleEvent() {
                                             return (
                                                 <MDBTableBody>
                                                     <tr>
-                                                        <th scope='row' className='mt-2'>{player.playerName}</th>
-                                                        <td><MDBBtn color='success'>Accept</MDBBtn></td>
-                                                        <td><MDBBtn color='danger'>Reject</MDBBtn></td>
+                                                        <th scope='row' className='mt-2'><h4>{player.playerName}</h4></th>
                                                     </tr>
                                                 </MDBTableBody>
                                             )
@@ -114,7 +186,7 @@ function SingleEvent() {
                         <div style={{ margin: "auto", padding: "15px", maxWidth: "500px", alignContent: "center", marginTop: "30px" }}>
                             <h2>Requested Players</h2>
                             {
-                                !Requestplayers && (
+                                Requestplayers.length==0 && (
                                     <>No player register yet</>
                                 )
                             }
@@ -126,8 +198,8 @@ function SingleEvent() {
                                                 <MDBTableBody>
                                                     <tr>
                                                         <th scope='row' className='mt-2'>{player.playerName}</th>
-                                                        <td><MDBBtn color='success'>Accept</MDBBtn></td>
-                                                        <td><MDBBtn color='danger'>Reject</MDBBtn></td>
+                                                        <td><MDBBtn color='success' onClick={()=>acceptHandler(player)}>Accept</MDBBtn></td>
+                                                        <td><MDBBtn color='danger'  onClick={()=>rejectHandler(player)}>Reject</MDBBtn></td>
                                                     </tr>
                                                 </MDBTableBody>
                                             )

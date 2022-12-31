@@ -78,7 +78,7 @@ const authSlice = createSlice({
         },
         [updateRequestPending.fulfilled] : (state,action)=> {
             state.loading = false;
-            state.user = action.payload;
+            state.user.result[0] = action.payload;
         },
         [updateRequestPending.rejected] : (state,action)=> {
             state.loading = false;
