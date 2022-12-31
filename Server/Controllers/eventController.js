@@ -42,10 +42,10 @@ export const getOwnerEvents = async(req, res) => {
 }
 
 export const getEventBySearch = async(req,res) => {
-    const {searchQuery} = req.query;
+    const {searchQuery} = req.params;
     try {
         const title = new RegExp(searchQuery,"i");
-        const events = await eventModel.find({eventName: title})
+        const events = await eventModel.find({title})
         return res.status(200).json({data:events});
     } catch (error) {
         return res.status(500).json({message: "Something went wrong"});

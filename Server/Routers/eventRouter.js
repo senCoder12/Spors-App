@@ -8,7 +8,7 @@ eventRouter.post('/', auth, createEvent);
 eventRouter.get('/', getEvents);
 eventRouter.get('/:eventId', getEvent);
 eventRouter.patch('/:id',auth, updateEvent);
-eventRouter.get('/search', getEventBySearch);
+eventRouter.get('/search/:searchQuery', getEventBySearch);
 eventRouter.get('/ownerEvents', auth, getOwnerEvents);
 
 export default eventRouter;

@@ -75,7 +75,7 @@ export const signin =  async (req, res) => {
 export const updateEventConfirmRequestState = async(req, res) => {
     try {
         const updatedData = req.body;
-        await userModel.findByIdAndUpdate(req.id,updatedData,{new: true});
+        await userModel.findByIdAndUpdate(req.userId,updatedData,{new: true});
         return res.status(200).json(updatedData);   
     } catch (error) {
         return res.status(404).json({message: "Something went wrong"});  
