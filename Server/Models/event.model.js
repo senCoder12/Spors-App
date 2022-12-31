@@ -1,5 +1,14 @@
 import mongoose from "mongoose";
 
+const playerSchema = new mongoose.Schema({
+  playerName: {
+    type: String
+  },
+  playerId: {
+    type: String
+  },
+});
+
 const eventSchema = new mongoose.Schema(
   {
     title: {
@@ -30,18 +39,18 @@ const eventSchema = new mongoose.Schema(
     //     type: [String],
     //     required: false
     // },
-    players: [
-      {playerName: String},
-      {playerId: String}
-    ],
+    players: {
+      type: [playerSchema],
+      default: []
+    },
     // Requestplayers: {
     //     type: [String],
     //     required: false
     // },
-    Requestplayers: [
-      {playerName: String},
-      {playerId: String}
-    ]
+    Requestplayers: {
+      type: [playerSchema],
+      default: []
+    }
   },
   {
     versionKey: false,

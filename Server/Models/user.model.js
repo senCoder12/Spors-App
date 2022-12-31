@@ -1,5 +1,13 @@
 import mongoose from "mongoose";
 
+const eventSchema = new mongoose.Schema({
+  eventName: {
+    type: String
+  },
+  eventId: {
+    type: String
+  },
+});
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -14,13 +22,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: false
     },
-    EventsConfirmed: {
-        type: [String],
-        default: []
+    EventsConfirmed:{
+      type: [eventSchema],
+      default: []
     },
     EventsPending: {
-        type: [String],
-        default: []
+      type: [eventSchema],
+      default: []
     }
   },
   {
