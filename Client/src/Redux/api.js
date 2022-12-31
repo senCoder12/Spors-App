@@ -21,4 +21,4 @@ export const getEvents = () => API.get(`/event`);
 export const getEvent = (id) => API.get(`/event/${id}`);
 export const getOwnerEvents = () => API.get(`/event/ownerEvents`);
 export const updateEvent = (updatedData,eventId)  => API.patch(`/event/${eventId}`,updatedData);
-export const getEventsBySearch = (searchQuery) => API.get(`/event/search?searchQuery=${searchQuery}`);
+export const getEventsBySearch = (searchQuery) => API.get(`/event/search/${searchQuery}`);

@@ -15,6 +15,7 @@ import { setLogout } from '../Redux/Features/authSlice';
 // import { getTours, getToursBySearch } from '../Redux/Features/tourSlice';
 import { useNavigate } from 'react-router-dom';
 import decode from "jwt-decode";
+import { getEvents, getEventsBySearch } from '../Redux/Features/eventSlice';
 
 function Header() {
     const { user } = useSelector(state => ({ ...state.auth }))
@@ -22,14 +23,6 @@ function Header() {
     const [search,setSearch] = useState("");
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    // const token = user?.token;
-
-    // if(token) {
-    //     const decodeToken = decode(token);
-    //     if(decodeToken.exp * 1000 < new Date().getTime() ) {
-    //         dispatch(setLogout());
-    //     }
-    // }
 
     const handleLogout = () => {
         localStorage.clear("profile");
@@ -37,13 +30,13 @@ function Header() {
     }
     const handleSubmit = (e) => {
         e.preventDefault();
-        // if(search) {
-        //     dispatch(getToursBySearch(search));
-        //     navigate(`/tours/search?searchQuery=${search}`)
-        // } else {
-        //     dispatch(getTours());
-        //     navigate("/");
-        // }
+        if(search) {
+            dispatch(getEventsBySearch(search));
+            navigate(`/events/search?searchQuery=${search}`)
+        } else {
+            dispatch(getEvents());
+            navigate("/");
+        }
         setSearch("");
     }
 
@@ -64,11 +57,18 @@ function Header() {
                             </MDBNavbarLink>
                         </MDBNavbarItem>
                         {user?.result[0]?._id && (
+                            <>
                             <MDBNavbarItem>
                                 <MDBNavbarLink href='/addEvent'>
                                     <p className='header-text'>Add Event</p>
                                 </MDBNavbarLink>
                              </MDBNavbarItem>
+                             {/* <MDBNavbarItem>
+                                <MDBNavbarLink href='/events'>
+                                    <p className='header-text'>Events Status</p>
+                                </MDBNavbarLink>
+                             </MDBNavbarItem> */}
+                            </>
                         )}
                         {user?.result[0]?._id ? (
                             <MDBNavbarItem>

@@ -16,7 +16,7 @@ export const register = createAsyncThunk("auth/register", async({formValue,navig
     try {
         const response = await api.signUp(formValue);
         toast.success("Signup successfully");
-        navigate("/");
+        navigate("/login");
         return response.data;
     } catch (error) {
         toast.error("User already registered"); 
@@ -78,7 +78,7 @@ const authSlice = createSlice({
         },
         [updateRequestPending.fulfilled] : (state,action)=> {
             state.loading = false;
-            state.user.result[0] = action.payload;
+            state.user.result = [action.payload];
         },
         [updateRequestPending.rejected] : (state,action)=> {
             state.loading = false;

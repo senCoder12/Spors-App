@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { MDBCard, MDBCardBody, MDBCardImage, MDBCardGroup, MDBCardText, MDBIcon, MDBTooltip, MDBBtn } from "mdb-react-ui-kit"
+import { MDBCard, MDBCardBody, MDBCardImage, MDBCardGroup, MDBCardText, MDBIcon, MDBTooltip, MDBBtn, MDBSpinner } from "mdb-react-ui-kit"
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { getEvent, updateEvent } from '../Redux/Features/eventSlice';
@@ -8,7 +8,7 @@ import { MDBTable, MDBTableHead, MDBTableBody } from 'mdb-react-ui-kit';
 import { updateRequestPending } from '../Redux/Features/authSlice';
 
 function SingleEvent() {
-    const { event } = useSelector((state) => ({ ...state.event }));
+    const { event, loading:loadingEvent } = useSelector((state) => ({ ...state.event }));
     const { user, loading } = useSelector((state) => ({ ...state.auth }));
     const dispatch = useDispatch();
     const { title, description, _id, maximumNoOfPlayers, img, players, ownerId, eventTime, Requestplayers } = event;
@@ -20,38 +20,46 @@ function SingleEvent() {
         dispatch(getEvent(eventId));
     }, [])
 
+    const checkAvlPlayers = () => {
+        if (playerss.length >= maximumNoOfPlayers) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     const checkExpiredGame = () => {
-        if (eventTime && eventTime < new Date()) {
+        if (eventTime && Date.parse(eventTime) < new Date()) {
             return true;
         }
         return false;
     }
 
-    const sendRequestHandler = ()=> {
-        let updatedEventData = {...event};
-        if(!updatedEventData.Requestplayers.length) {
-            updatedEventData.Requestplayers=[{
+    const sendRequestHandler = () => {
+        let updatedEventData = { ...event };
+        if (!updatedEventData.Requestplayers.length) {
+            updatedEventData.Requestplayers = [{
                 playerName: user?.result[0].name,
                 playerId: user?.result[0]._id
             }];
         } else {
-            const {Requestplayers} = updatedEventData;
+            const { Requestplayers } = updatedEventData;
             updatedEventData.Requestplayers = [...Requestplayers, {
                 playerName: user?.result[0].name,
                 playerId: user?.result[0]._id
             }]
         }
-        dispatch(updateEvent({eventId:_id,updatedEventData}));
+        dispatch(updateEvent({ eventId: _id, updatedEventData }));
 
-        let updateUser = {...user.result[0]};
-        if(!updateUser.EventsPending.length) {
-            updateUser.EventsPending=[{
+        let updateUser = { ...user.result[0] };
+        if (!updateUser.EventsPending.length) {
+            updateUser.EventsPending = [{
                 eventName: event?.title,
                 eventId: event?._id
             }];
         } else {
-            const {EventsPending} = updateUser;
-            updateUser.Requestplayers = [...EventsPending, {
+            let { EventsPending } = updateUser;
+            updateUser.EventsPending = [...EventsPending, {
                 eventName: event?.title,
                 eventId: event?._id
             }]
@@ -59,30 +67,53 @@ function SingleEvent() {
         dispatch(updateRequestPending(updateUser));
     }
     const acceptHandler = (requestedplayer) => {
-        let updatedEventData = {...event};
+        let updatedEventData = { ...event };
         updatedEventData.Requestplayers = updatedEventData.Requestplayers.filter((player) => {
-            return player.playerId!== requestedplayer.playerId;
+            return player.playerId !== requestedplayer.playerId;
         });
-        if(!players.length) {
+        if (!players.length) {
             updatedEventData.players = [{
                 playerName: requestedplayer.playerName,
                 playerId: requestedplayer.playerId
             }];
         } else {
-            const {players} = updatedEventData;
+            const { players } = updatedEventData;
             updatedEventData.players = [...players, {
                 playerName: requestedplayer.playerName,
                 playerId: requestedplayer.playerId
             }]
         }
-        dispatch(updateEvent({eventId:_id,updatedEventData}));
+        dispatch(updateEvent({ eventId: _id, updatedEventData }));
+
+        let updateUser = { ...user.result[0] };
+        const { EventsConfirmed } = updateUser;
+        if (!EventsConfirmed.length) {
+            updatedEventData.EventsConfirmed = [{
+                eventName: event?.title,
+                eventId: event?._id
+            }];
+        } else {
+            updateUser.EventsConfirmed = [...EventsConfirmed, {
+                eventName: event?.title,
+                eventId: event?._id
+            }]
+        }
+        dispatch(updateRequestPending(updateUser));
+
     }
-    const rejectHandler = (requestedplayer)=> {
-        let updatedEventData = {...event};
+    const rejectHandler = (requestedplayer) => {
+        let updatedEventData = { ...event };
         updatedEventData.Requestplayers = updatedEventData.Requestplayers.filter((player) => {
-            return player.playerId!== requestedplayer.playerId;
+            return player.playerId !== requestedplayer.playerId;
         });
-        dispatch(updateEvent({eventId:_id,updatedEventData}));
+        dispatch(updateEvent({ eventId: _id, updatedEventData }));
+
+        // let updateUser = {...user.result[0]};
+        // const {EventsPending} = updateUser;
+        // updateUser.EventsPending = updateUser.EventsPending.filter((event1) => {
+        //     return event1.eventId!= event?._id;
+        // });
+        // dispatch(updateRequestPending(updateUser));
     }
 
     // const getFormatTime = (event)=> {}
@@ -114,29 +145,50 @@ function SingleEvent() {
                                             Event Timing: {eventTime}
                                         </MDBCol>
                                         {
-                                            !checkExpiredGame() && user?.result[0]?._id != ownerId && !Requestedplayers.find(elm=> elm.playerId==user?.result[0]?._id) &&
-                                            !playerss.find(elm=> elm.playerId==user?.result[0]?._id) && (
+                                            checkAvlPlayers() && !checkExpiredGame() && user?.result[0]?._id != ownerId && !Requestedplayers.find(elm => elm.playerId == user?.result[0]?._id) &&
+                                            !playerss.find(elm => elm.playerId == user?.result[0]?._id) && (
                                                 <MDBCol md='4'>
-                                                    <MDBBtn onClick={()=>sendRequestHandler()}>Send Request</MDBBtn>
+                                                    {/* <MDBBtn onClick={() => sendRequestHandler()}>Send Request</MDBBtn> */}
+                                                    <MDBBtn style={{ width: "100%" }} className="mt-2" onClick={() => sendRequestHandler()}>
+                                                        {
+                                                            loading && (
+                                                                <MDBSpinner
+                                                                    size='sm'
+                                                                    role="status"
+                                                                    tag="span"
+                                                                    className="me-2"
+                                                                />
+                                                            )
+                                                        }
+                                                        Send Request
+                                                    </MDBBtn>
                                                 </MDBCol>
                                             )
                                         }
                                         {
-                                            !checkExpiredGame() &&user?.result[0]?._id != ownerId && Requestedplayers.find(elm=> elm.playerId==user?.result[0]?._id) && (
+                                            !checkAvlPlayers() && !checkExpiredGame() && user?.result[0]?._id != ownerId && !Requestedplayers.find(elm => elm.playerId == user?.result[0]?._id) &&
+                                            !playerss.find(elm => elm.playerId == user?.result[0]?._id) && (
+                                                <MDBCol md='4'>
+                                                    <MDBBtn disabled="true">Send Request</MDBBtn>
+                                                </MDBCol>
+                                            )
+                                        }
+                                        {
+                                            checkAvlPlayers() && !checkExpiredGame() && user?.result[0]?._id != ownerId && Requestedplayers.find(elm => elm.playerId == user?.result[0]?._id) && (
                                                 <MDBCol md='4'>
                                                     <MDBBtn>Request pending...</MDBBtn>
                                                 </MDBCol>
                                             )
                                         }
                                         {
-                                            !checkExpiredGame() &&user?.result[0]?._id != ownerId && playerss.find(elm=> elm.playerId==user?.result[0]?._id) && (
+                                            !checkExpiredGame() && user?.result[0]?._id != ownerId && playerss.find(elm => elm.playerId == user?.result[0]?._id) && (
                                                 <MDBCol md='4'>
                                                     <MDBBtn>Accepted</MDBBtn>
                                                 </MDBCol>
                                             )
                                         }
                                         {
-                                            !checkExpiredGame() &&user?.result[0]?._id == ownerId && (
+                                            !checkExpiredGame() && user?.result[0]?._id == ownerId && (
                                                 <MDBCol md='4'>
                                                     <MDBBtn color='info'>Own Event</MDBBtn>
                                                 </MDBCol>
@@ -162,7 +214,7 @@ function SingleEvent() {
                         <div style={{ margin: "auto", padding: "15px", maxWidth: "500px", alignContent: "center", marginTop: "30px" }}>
                             <h2>Event Players</h2>
                             {
-                                playerss.length==0  && (
+                                playerss.length == 0 && (
                                     <>No player is Accepted yet</>
                                 )
                             }
@@ -186,7 +238,7 @@ function SingleEvent() {
                         <div style={{ margin: "auto", padding: "15px", maxWidth: "500px", alignContent: "center", marginTop: "30px" }}>
                             <h2>Requested Players</h2>
                             {
-                                Requestplayers.length==0 && (
+                                Requestplayers.length == 0 && (
                                     <>No player register yet</>
                                 )
                             }
@@ -198,8 +250,57 @@ function SingleEvent() {
                                                 <MDBTableBody>
                                                     <tr>
                                                         <th scope='row' className='mt-2'>{player.playerName}</th>
-                                                        <td><MDBBtn color='success' onClick={()=>acceptHandler(player)}>Accept</MDBBtn></td>
-                                                        <td><MDBBtn color='danger'  onClick={()=>rejectHandler(player)}>Reject</MDBBtn></td>
+                                                        <td><MDBBtn style={{ width: "100%" }}  color='success' onClick={() => acceptHandler(player)}>
+                                                        {
+                                                            loadingEvent && (
+                                                                <MDBSpinner
+                                                                    size='sm'
+                                                                    role="status"
+                                                                    tag="span"
+                                                                    className="me-2"
+                                                                />
+                                                            )
+                                                        }
+                                                        Accept
+                                                    </MDBBtn></td>
+                                                        <td><MDBBtn style={{ width: "100%" }}  color='danger' onClick={() => rejectHandler(player)}>
+                                                        {
+                                                            loadingEvent && (
+                                                                <MDBSpinner
+                                                                    size='sm'
+                                                                    role="status"
+                                                                    tag="span"
+                                                                    className="me-2"
+                                                                />
+                                                            )
+                                                        }
+                                                        Reject
+                                                    </MDBBtn></td>
+                                                    </tr>
+                                                </MDBTableBody>
+                                            )
+                                        })
+
+                                    )
+                                }
+                            </MDBTable>
+                        </div>
+                    </>
+                )
+            }
+            {
+                user?.result[0]?._id != ownerId && playerss.find(elm => elm.playerId == user?.result[0]?._id) && (
+                    <>
+                        <div style={{ margin: "auto", padding: "15px", maxWidth: "500px", alignContent: "center", marginTop: "30px" }}>
+                            <h2>Event Players</h2>
+                            <MDBTable>
+                                {
+                                    players && players?.length > 0 && (
+                                        players.map(player => {
+                                            return (
+                                                <MDBTableBody>
+                                                    <tr>
+                                                        <th scope='row' className='mt-2'><h4>{player.playerName}</h4></th>
                                                     </tr>
                                                 </MDBTableBody>
                                             )

@@ -6,15 +6,18 @@ import Register from '../Pages/Register'
 import Home from '../Pages/Home'
 import Privateroute from './PrivateRoute.js'
 import SingleEvent from '../Pages/SingleEvent.js'
+import EventStatus from '../Pages/EventStatus.js'
 function Allroutes() {
   return (
     <BrowserRouter>
         <Routes>
             <Route path ="/" element={<Home/>}/>
+            <Route path ="/events/search" element={<Home/>}/>
             <Route path ="/login" element={<Login/>}/>
             <Route path ="/register" element={<Register/>}/>
             <Route path ="/addEvent" element={<Privateroute><AddEventPage/></Privateroute>}/>
             <Route path ="/event/:eventId" element={<Privateroute><SingleEvent/></Privateroute>}/>
+            <Route path ="/events" element={<Privateroute><EventStatus/></Privateroute>}/>
         </Routes>
     </BrowserRouter>
   )
